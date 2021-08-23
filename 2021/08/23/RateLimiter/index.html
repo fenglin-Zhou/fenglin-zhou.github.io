@@ -20,18 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="请求速率控制ERaft实现了最基本的请求速率控制，采用的是令牌桶算法。 令牌桶算法令牌桶算法原理很简单，以一定的速率往令牌桶中放入令牌，当请求到来时查看是否有可用令牌，若有就拿掉一个令牌响应请求，否则拒绝服务。令牌桶算法可以应对突然的请求爆炸，也可以防止恶意高频请求，算法实现也很简单。  结合ERaft分析在ERaft中，令牌桶主要是用于服务端请求控制（请求命令条数控制而非字节流），对于过于频繁的">
+  <meta name="description" content="请求速率控制ERaft实现了最基本的请求速率控制，采用的是令牌桶算法。 令牌桶算法令牌桶算法原理很简单，以一定的速率往令牌桶中放入令牌，当请求到来时查看是否有可用令牌，若有就拿掉一个令牌响应请求，否则拒绝服务。令牌桶算法可以应对突然的请求爆炸，也可以防止恶意高频请求，算法实现也很简单。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RateLimiter">
 <meta property="og:url" content="http://example.com/2021/08/23/RateLimiter/index.html">
 <meta property="og:site_name" content="Fenglin的小博客">
-<meta property="og:description" content="请求速率控制ERaft实现了最基本的请求速率控制，采用的是令牌桶算法。 令牌桶算法令牌桶算法原理很简单，以一定的速率往令牌桶中放入令牌，当请求到来时查看是否有可用令牌，若有就拿掉一个令牌响应请求，否则拒绝服务。令牌桶算法可以应对突然的请求爆炸，也可以防止恶意高频请求，算法实现也很简单。  结合ERaft分析在ERaft中，令牌桶主要是用于服务端请求控制（请求命令条数控制而非字节流），对于过于频繁的">
+<meta property="og:description" content="请求速率控制ERaft实现了最基本的请求速率控制，采用的是令牌桶算法。 令牌桶算法令牌桶算法原理很简单，以一定的速率往令牌桶中放入令牌，当请求到来时查看是否有可用令牌，若有就拿掉一个令牌响应请求，否则拒绝服务。令牌桶算法可以应对突然的请求爆炸，也可以防止恶意高频请求，算法实现也很简单。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/ratelimiter.png">
 <meta property="article:published_time" content="2021-08-23T09:47:09.000Z">
-<meta property="article:modified_time" content="2021-08-23T10:49:44.605Z">
+<meta property="article:modified_time" content="2021-08-23T13:48:21.825Z">
 <meta property="article:author" content="凤林">
-<meta property="article:tag" content="数据库,分布式,c++">
+<meta property="article:tag" content="限流">
+<meta property="article:tag" content="ERaft">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/ratelimiter.png">
 
 <link rel="canonical" href="http://example.com/2021/08/23/RateLimiter/">
 
@@ -187,7 +190,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-08-23 17:47:09 / 修改时间：18:49:44" itemprop="dateCreated datePublished" datetime="2021-08-23T17:47:09+08:00">2021-08-23</time>
+              <time title="创建时间：2021-08-23 17:47:09 / 修改时间：21:48:21" itemprop="dateCreated datePublished" datetime="2021-08-23T17:47:09+08:00">2021-08-23</time>
             </span>
 
           
@@ -201,9 +204,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h4 id="请求速率控制"><a href="#请求速率控制" class="headerlink" title="请求速率控制"></a>请求速率控制</h4><p>ERaft实现了最基本的请求速率控制，采用的是令牌桶算法。</p>
+        <h4 id="请求速率控制"><a href="#请求速率控制" class="headerlink" title="请求速率控制"></a>请求速率控制</h4><p><a target="_blank" rel="noopener" href="https://github.com/eraft-io/eraft">ERaft</a>实现了最基本的请求速率控制，采用的是令牌桶算法。</p>
 <h5 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h5><p>令牌桶算法原理很简单，以一定的速率往令牌桶中放入令牌，当请求到来时查看是否有可用令牌，若有就拿掉一个令牌响应请求，否则拒绝服务。令牌桶算法可以应对突然的请求爆炸，也可以防止恶意高频请求，算法实现也很简单。</p>
-<p><img src=""></p>
+<span id="more"></span>
+
+<p><img src="/img/ratelimiter.png"></p>
 <h5 id="结合ERaft分析"><a href="#结合ERaft分析" class="headerlink" title="结合ERaft分析"></a>结合ERaft分析</h5><p>在ERaft中，令牌桶主要是用于服务端请求控制（请求命令条数控制而非字节流），对于过于频繁的请求不予处理，返回错误信息，防止服务器由于压力过大而失效。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// capacity holds the overall capacity of the bucket.</span></span><br><span class="line"><span class="keyword">uint64_t</span> capacity_;</span><br><span class="line"><span class="comment">// quantum holds how many tokens are added on each tick.</span></span><br><span class="line"><span class="keyword">uint64_t</span> quantum_;</span><br><span class="line"><span class="comment">// availableTokens holds the number of available</span></span><br><span class="line"><span class="comment">// tokens as of the associated latestTick.</span></span><br><span class="line"><span class="comment">// It will be negative when there are consumers</span></span><br><span class="line"><span class="comment">// waiting for tokens.</span></span><br><span class="line"><span class="keyword">uint64_t</span> available_tokens_;</span><br><span class="line"><span class="comment">// latestTick holds the latest tick for which</span></span><br><span class="line"><span class="comment">// we know the number of tokens in the bucket.</span></span><br><span class="line"><span class="keyword">uint64_t</span> latest_tick_;</span><br><span class="line"><span class="comment">// fillInterval holds the interval between each tick.</span></span><br><span class="line"><span class="keyword">uint64_t</span> fill_interval_;</span><br><span class="line"><span class="keyword">uint64_t</span> failed_count_;</span><br><span class="line">std::mutex mutex_;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">uint64_t</span> US_PER_SECOND = <span class="number">1000000</span>;</span><br></pre></td></tr></table></figure>
 
@@ -222,6 +227,10 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%99%90%E6%B5%81/" rel="tag"># 限流</a>
+              <a href="/tags/ERaft/" rel="tag"># ERaft</a>
+          </div>
 
         
 
@@ -314,7 +323,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
