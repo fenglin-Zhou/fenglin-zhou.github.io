@@ -20,18 +20,23 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="记录学习心得">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Fenglin的小博客">
-<meta property="og:url" content="http://example.com/archives/index.html">
+  <meta name="description" content="SkipListskiplist也就是跳跃表，是William Pugh在1990年Skip Lists: A Probabilistic Alternative to Balanced Trees文中提出的一种数据结构，相比较平衡树和红黑树更加简单，性能也十分出色，是典型的用空间换时间的算法。skiplist的数据结构如下图：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="skiplist">
+<meta property="og:url" content="http://example.com/2021/09/05/skiplist/index.html">
 <meta property="og:site_name" content="Fenglin的小博客">
-<meta property="og:description" content="记录学习心得">
+<meta property="og:description" content="SkipListskiplist也就是跳跃表，是William Pugh在1990年Skip Lists: A Probabilistic Alternative to Balanced Trees文中提出的一种数据结构，相比较平衡树和红黑树更加简单，性能也十分出色，是典型的用空间换时间的算法。skiplist的数据结构如下图：">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/skiplist.png">
+<meta property="og:image" content="http://example.com/img/skiplist1.png">
+<meta property="article:published_time" content="2021-09-05T06:24:53.000Z">
+<meta property="article:modified_time" content="2021-09-05T06:48:45.120Z">
 <meta property="article:author" content="凤林">
-<meta property="article:tag" content="数据库,分布式,c++">
+<meta property="article:tag" content="skiplist">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/skiplist.png">
 
-<link rel="canonical" href="http://example.com/archives/">
+<link rel="canonical" href="http://example.com/2021/09/05/skiplist/">
 
 
 <script id="page-configurations">
@@ -39,12 +44,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Fenglin的小博客</title>
+  <title>skiplist | Fenglin的小博客</title>
   
 
 
@@ -154,90 +159,87 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 3 篇日志。 继续努力。</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/09/05/skiplist/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/avatar.jpg">
+      <meta itemprop="name" content="凤林">
+      <meta itemprop="description" content="记录学习心得">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fenglin的小博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          skiplist
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-09-05 14:24:53 / 修改时间：14:48:45" itemprop="dateCreated datePublished" datetime="2021-09-05T14:24:53+08:00">2021-09-05</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
-    </div>
+        <h4 id="SkipList"><a href="#SkipList" class="headerlink" title="SkipList"></a>SkipList</h4><p>skiplist也就是跳跃表，是<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/William_Pugh_(computer_scientist)">William Pugh</a>在1990年<a target="_blank" rel="noopener" href="https://15721.courses.cs.cmu.edu/spring2018/papers/08-oltpindexes1/pugh-skiplists-cacm1990.pdf">Skip Lists: A Probabilistic Alternative to Balanced Trees</a>文中提出的一种数据结构，相比较平衡树和红黑树更加简单，性能也十分出色，是典型的用空间换时间的算法。skiplist的数据结构如下图：</p>
+<span id="more"></span>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-09-05T14:24:53+08:00"
-              content="2021-09-05">
-          09-05
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/09/05/skiplist/" itemprop="url">
-            <span itemprop="name">skiplist</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-08-23T17:47:09+08:00"
-              content="2021-08-23">
-          08-23
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/08/23/RateLimiter/" itemprop="url">
-            <span itemprop="name">RateLimiter</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-08-13T10:40:32+08:00"
-              content="2021-08-13">
-          08-13
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/08/13/Raft%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%9B%86%E7%BE%A4%E6%88%90%E5%91%98%E5%8F%98%E6%9B%B4/" itemprop="url">
-            <span itemprop="name">Raft如何实现集群成员变更</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+<p><img src="/img/skiplist.png"></p>
+<p>单链表的结构是顺序存储，每一个节点有一个next指向下一个位置，skiplist其实也是单链表的扩展，在每一个节点加了一个层的概念，每个节点都有不同的层来指向下面的节点(可能是下一个，之后第n个)。这样我们查询或插入时就可以从最上面的层开始，可以跳跃过很多不必要的节点，大大缩短时间。</p>
+<p><img src="/img/skiplist1.png"></p>
+<p>以论文给出的例子来说，header是头节点（注意这里是不存数据的）。我们要插入17，那么从最高层开始，比较header-&gt;forward[level]-&gt;key 和要插入的17的值，采用forward比较保证了我们最后停留在&lt;17的值的node，每一层向下，这样我们就拿到了每一层比17值小的node。要插入17，我们就可以对没一层进行类似单链表的操作，当然新加入的节点的层数，应该随机生成。也就是说不一定要最高层数。</p>
+<p>William Pugh的论文中对于插入，删除都给出了伪代码。十分的容易实现，建议直接对着论文撸代码。我自己也实现了一下，<a target="_blank" rel="noopener" href="https://github.com/fenglin-Zhou/SkipListKV">SkipListKV</a>，因为我是在看kvdb，所以是存的key value，区别不大。还是比较简单的。</p>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/skiplist/" rel="tag"># skiplist</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/08/23/RateLimiter/" rel="prev" title="RateLimiter">
+      <i class="fa fa-chevron-left"></i> RateLimiter
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
@@ -290,6 +292,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#SkipList"><span class="nav-number">1.</span> <span class="nav-text">SkipList</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
