@@ -160,6 +160,72 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/04/BTree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/avatar.jpg">
+      <meta itemprop="name" content="凤林">
+      <meta itemprop="description" content="记录学习心得">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fenglin的小博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/10/04/BTree/" class="post-title-link" itemprop="url">BTree</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-10-04 22:42:33 / 修改时间：22:45:39" itemprop="dateCreated datePublished" datetime="2021-10-04T22:42:33+08:00">2021-10-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="B-Tree"><a href="#B-Tree" class="headerlink" title="B-Tree"></a>B-Tree</h3><p>B-Tree 是一种自平衡搜索树。在大多数其他自平衡搜索树（如 AVL 和红黑树）中，假设所有内容都在主内存中。要理解B-Trees的使用，我们必须考虑无法容纳在主内存中的大量数据。当key个数较多时，数据以块的形式从磁盘读取。与主存储器访问时间相比，磁盘访问时间非常长。使用B树的主要思想是减少磁盘访问次数。大多数树操作（搜索、插入、删除..等）需要 O(h)次磁盘访问，其中h是树的高度。B树是一棵胖树，通过在B-Tree节点中放置最大可能的键来保持B-Tree的高度较低。通常B-Tree节点大小保持等于磁盘块大小。由于B树的高度较低，因此与平衡二叉搜索树（如 AVL 树、红黑树等）相比，大多数操作的总磁盘访问量显着减少。更多的原理也不再赘述，网上资料很多。我们在这里更多的介绍实现，<a target="_blank" rel="noopener" href="https://github.com/fenglin-Zhou/Tree-structures">代码</a>。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/10/04/BTree/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/09/26/avltree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -592,14 +658,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

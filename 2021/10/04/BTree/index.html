@@ -20,23 +20,23 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="二叉搜索树BST是比较简单的树结构，满足下面三个性质。 1.若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值； 2.若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值； 3.任意节点的左、右子树也分别为二叉查找树； 代码地址">
+  <meta name="description" content="B-TreeB-Tree 是一种自平衡搜索树。在大多数其他自平衡搜索树（如 AVL 和红黑树）中，假设所有内容都在主内存中。要理解B-Trees的使用，我们必须考虑无法容纳在主内存中的大量数据。当key个数较多时，数据以块的形式从磁盘读取。与主存储器访问时间相比，磁盘访问时间非常长。使用B树的主要思想是减少磁盘访问次数。大多数树操作（搜索、插入、删除..等）需要 O(h)次磁盘访问，其中h是树的高">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Binary_Search_Tree">
-<meta property="og:url" content="http://example.com/2021/09/25/Binary-Search-Tree/index.html">
+<meta property="og:title" content="BTree">
+<meta property="og:url" content="http://example.com/2021/10/04/BTree/index.html">
 <meta property="og:site_name" content="Fenglin的小博客">
-<meta property="og:description" content="二叉搜索树BST是比较简单的树结构，满足下面三个性质。 1.若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值； 2.若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值； 3.任意节点的左、右子树也分别为二叉查找树； 代码地址">
+<meta property="og:description" content="B-TreeB-Tree 是一种自平衡搜索树。在大多数其他自平衡搜索树（如 AVL 和红黑树）中，假设所有内容都在主内存中。要理解B-Trees的使用，我们必须考虑无法容纳在主内存中的大量数据。当key个数较多时，数据以块的形式从磁盘读取。与主存储器访问时间相比，磁盘访问时间非常长。使用B树的主要思想是减少磁盘访问次数。大多数树操作（搜索、插入、删除..等）需要 O(h)次磁盘访问，其中h是树的高">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/Binary_search_tree.png">
-<meta property="article:published_time" content="2021-09-25T12:48:10.000Z">
-<meta property="article:modified_time" content="2021-09-26T07:58:14.192Z">
+<meta property="og:image" content="http://example.com/img/btreesplit.png">
+<meta property="article:published_time" content="2021-10-04T14:42:33.000Z">
+<meta property="article:modified_time" content="2021-10-04T14:45:39.064Z">
 <meta property="article:author" content="凤林">
 <meta property="article:tag" content="Treedatastructure">
-<meta property="article:tag" content="BST">
+<meta property="article:tag" content="BTree">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/img/Binary_search_tree.png">
+<meta name="twitter:image" content="http://example.com/img/btreesplit.png">
 
-<link rel="canonical" href="http://example.com/2021/09/25/Binary-Search-Tree/">
+<link rel="canonical" href="http://example.com/2021/10/04/BTree/">
 
 
 <script id="page-configurations">
@@ -49,7 +49,7 @@
   };
 </script>
 
-  <title>Binary_Search_Tree | Fenglin的小博客</title>
+  <title>BTree | Fenglin的小博客</title>
   
 
 
@@ -166,7 +166,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/09/25/Binary-Search-Tree/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/04/BTree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/img/avatar.jpg">
@@ -179,7 +179,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Binary_Search_Tree
+          BTree
         </h1>
 
         <div class="post-meta">
@@ -188,16 +188,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-09-25 20:48:10" itemprop="dateCreated datePublished" datetime="2021-09-25T20:48:10+08:00">2021-09-25</time>
+              <time title="创建时间：2021-10-04 22:42:33 / 修改时间：22:45:39" itemprop="dateCreated datePublished" datetime="2021-10-04T22:42:33+08:00">2021-10-04</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-09-26 15:58:14" itemprop="dateModified" datetime="2021-09-26T15:58:14+08:00">2021-09-26</time>
-              </span>
 
           
 
@@ -210,21 +204,25 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h4 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h4><p>BST是比较简单的树结构，满足下面三个性质。<br></p>
-<p>1.若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；<br></p>
-<p>2.若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；<br></p>
-<p>3.任意节点的左、右子树也分别为二叉查找树；<br></p>
-<p><a target="_blank" rel="noopener" href="https://github.com/fenglin-Zhou/Tree-structures">代码地址</a></p>
+        <h3 id="B-Tree"><a href="#B-Tree" class="headerlink" title="B-Tree"></a>B-Tree</h3><p>B-Tree 是一种自平衡搜索树。在大多数其他自平衡搜索树（如 AVL 和红黑树）中，假设所有内容都在主内存中。要理解B-Trees的使用，我们必须考虑无法容纳在主内存中的大量数据。当key个数较多时，数据以块的形式从磁盘读取。与主存储器访问时间相比，磁盘访问时间非常长。使用B树的主要思想是减少磁盘访问次数。大多数树操作（搜索、插入、删除..等）需要 O(h)次磁盘访问，其中h是树的高度。B树是一棵胖树，通过在B-Tree节点中放置最大可能的键来保持B-Tree的高度较低。通常B-Tree节点大小保持等于磁盘块大小。由于B树的高度较低，因此与平衡二叉搜索树（如 AVL 树、红黑树等）相比，大多数操作的总磁盘访问量显着减少。更多的原理也不再赘述，网上资料很多。我们在这里更多的介绍实现，<a target="_blank" rel="noopener" href="https://github.com/fenglin-Zhou/Tree-structures">代码</a>。</p>
 <span id="more"></span>
 
-<p><img src="/img/Binary_search_tree.png"></p>
-<h5 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h5><p>插入的时候就是每次找到插入的位置，然后将前序节点的孩子节点指针指向新的插入的节点。还是比较简单的。</p>
-<h5 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h5><p>删除节点比较复杂一点，需要找到要删除的节点。<br></p>
-<p>1.如果没有左右孩子，直接删除。<br></p>
-<p>2.如果存在左孩子，那么我们需要找到左孩子序列中的最大节点，替代删除的节点，然后再去寻找删除替换上来的节点，重复到最后就变成了没有左右孩子的节点删除。<br></p>
-<p>3.没有左孩子，那么找到右孩子的最小节点，替代删除的节点，然后再去寻找删除替换上来的节点，重复到最后就变成了没有左右孩子的节点删除。<br></p>
-<p>最后都变成删除叶子节点。</p>
-<h5 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h5><p>查询就比较简单了，只需要比较找到值就好了。</p>
+<h4 id="struct设计"><a href="#struct设计" class="headerlink" title="struct设计"></a>struct设计</h4><p>首先我们需要定义我们的BTree Node的结构，isleaf_:用来表示当前节点是否是叶子节点，因为BTree的特点是所有的插入操作都是对叶子节点插入数据，初始化的时候root为叶子节点，后面新的都是复制操作或者非叶子节点。degree_:表示这个BTree每个节点可以容纳的数据，非根最少degree-1个，所有最多2*degree-1个。</p>
+<h4 id="Insert"><a href="#Insert" class="headerlink" title="Insert"></a>Insert</h4><p>插入操作相对来说比较简单。和avltree、bst有共同之处。大致就是我们需要通过root_一直找到那个可以插入key值的叶子节点并将数据写入。但在我们查询位置的时候多了一个判断节点数据是否存满的操作。BTree中必须保证每个节点存储的key数量不超过（2<strong>degree-1）个，所以在向下遍历的过程中当遇到节点key数量到（2</strong>degree-1）时，需要对他进行分裂，因为接下来的插入操作可能会导致key数量超过限制。child有效值永远比keys大一个一个，因为BTree下面一定是child[index]中的所有值都是大于keys[index]并小于keys[index+1]的。</p>
+<p><strong>#### Search</strong></p>
+<p>查询操作和前面两种树是一样的，不断向下遍历，找到key。或者一直到叶子节点还没找到表示并不存在这个key。</p>
+<h4 id="Remove"><a href="#Remove" class="headerlink" title="Remove"></a>Remove</h4><p>相对来说remove操作是最复杂的。这部分的原理很多资料都说过。这里我直接根据代码来分析。大致过程也是找到key的位置再操作。从root_开始，每次向下遍历主要经历一下几个过程：</p>
+<p>- 找到第一个大于或等于key的位置index,如果已经是叶子节点并且是要删除的key，那么就直接删除。</p>
+<p>- 如果不是叶子节点，那么说明我们要删除的节点是有孩子节点。这里有三种情况考虑: </p>
+<p>- - 当前位置孩子节点有degree及以上个key，那么就从它里面把最大的值（最大值一定是在叶子节点）拿过来覆盖要删除的key，然后在孩子节点中删除借的最大值。</p>
+<p> - 后一个位置孩子节点有degree及以上个key，那么就从它那里把最小的值（最小值一定是在叶子节点）拿过来覆盖要删除的key，然后在后一个位置的孩子节点中删除最小值。</p>
+<p> - 若这两个孩子节点都没有degree个key，那么根据BTree的特点，我们可以合并两个孩子节点再加上这个key，那么还是不会超过（2*degree-1）。再到child_[index]中删除key。</p>
+<p>- 第三种情况就是，key不在当前节点了，如果是叶子节点那就不存在这个key。我们首先保存一个flag=(index==keycount)也就是记录目前index是否是最后那个位置。如果当前位置的孩子节点存的key小于degree个，那么我们需要给他借到degree个，其实只需要借一个，因为BTree特性决定了非根节点最少degree-1个key。接下来分两种情况：</p>
+<p>- - 之前保存的flag为true，但是index&gt;keycount。可能会疑惑flag不是index==keycount吗，那是因为我们上面执行了借key的操作，如果没借到只能合并两个孩子，如果index是最后一个位置我们合并也只能向前合并。那么造成的结果就是index位置的key下沉到child中。当前节点keycount少了一个，那么我们只能到child[index-1]中删除key了。</p>
+<p> - 另一种就是直接向下到child[index]中删除key。也就是借key借到了，或者需要合并，但是我们不是在最后一个位置，合并也不会影响到向下remove的节点。</p>
+<p>不断重复上述过程就完成了remove操作，remove操作比insert是要复杂很多的，主要是涉及到很多种情况。需要分很多情况去讨论。</p>
+<h4 id="splitchild"><a href="#splitchild" class="headerlink" title="splitchild"></a>splitchild</h4><p>splitchild函数是我觉得需要细说的一个函数，两个参数，一个index，一个BTNode指针node。index是我们要分裂的的孩子节点在当前节点的位置，主要作用是将当前节点的孩子节点和key后移一个位置，给分裂的孩子节点的中值一个位置，也就是插入到index中，并且child[index]指向下面创建的新节点。既然是分裂我们需要创建一个新的节点，保存分裂节点的后degree-1个key和后degree个child，那么分裂的child就只剩下degree-1个有效信息了。具体如下图实例。</p>
+<p><img src="/img/btreesplit.png"></p>
 
     </div>
 
@@ -235,7 +233,7 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/Treedatastructure/" rel="tag"># Treedatastructure</a>
-              <a href="/tags/BST/" rel="tag"># BST</a>
+              <a href="/tags/BTree/" rel="tag"># BTree</a>
           </div>
 
         
@@ -244,13 +242,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/09/05/skiplist/" rel="prev" title="skiplist">
-      <i class="fa fa-chevron-left"></i> skiplist
+    <a href="/2021/09/26/avltree/" rel="prev" title="avltree">
+      <i class="fa fa-chevron-left"></i> avltree
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/09/26/avltree/" rel="next" title="avltree">
-      avltree <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -309,7 +304,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">二叉搜索树</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8F%92%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">插入</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A0%E9%99%A4"><span class="nav-number">1.2.</span> <span class="nav-text">删除</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2"><span class="nav-number">1.3.</span> <span class="nav-text">查询</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#B-Tree"><span class="nav-number">1.</span> <span class="nav-text">B-Tree</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#struct%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.1.</span> <span class="nav-text">struct设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Insert"><span class="nav-number">1.2.</span> <span class="nav-text">Insert</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Remove"><span class="nav-number">1.3.</span> <span class="nav-text">Remove</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#splitchild"><span class="nav-number">1.4.</span> <span class="nav-text">splitchild</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
