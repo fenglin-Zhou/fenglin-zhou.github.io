@@ -20,18 +20,23 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="记录学习心得">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Fenglin的小博客">
-<meta property="og:url" content="http://example.com/tags/BST/index.html">
+  <meta name="description" content="B+树上一篇文章讲了b树的实现，这一篇记录一下b+树的实现。b+树相较于b树的区别：  数据只存储在叶子节点，非叶子节点只是存放key用于比较。 叶子节点之间是相互连接的，可以是单链表或者双向链表。 非叶子节点的一个key，右子树中的key永远是大于等于当前key的。  别的也不再赘述了，网上资料很全，主要记录一下实现，这里主要和b树对比。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BPlusTree">
+<meta property="og:url" content="http://example.com/2021/10/16/BPlusTree/index.html">
 <meta property="og:site_name" content="Fenglin的小博客">
-<meta property="og:description" content="记录学习心得">
+<meta property="og:description" content="B+树上一篇文章讲了b树的实现，这一篇记录一下b+树的实现。b+树相较于b树的区别：  数据只存储在叶子节点，非叶子节点只是存放key用于比较。 叶子节点之间是相互连接的，可以是单链表或者双向链表。 非叶子节点的一个key，右子树中的key永远是大于等于当前key的。  别的也不再赘述了，网上资料很全，主要记录一下实现，这里主要和b树对比。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/bplustree1.png">
+<meta property="article:published_time" content="2021-10-16T10:01:36.000Z">
+<meta property="article:modified_time" content="2021-10-17T02:32:12.097Z">
 <meta property="article:author" content="凤林">
-<meta property="article:tag" content="数据库,分布式,c++">
+<meta property="article:tag" content="Treedatastructure">
+<meta property="article:tag" content="BPlusTree">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/bplustree1.png">
 
-<link rel="canonical" href="http://example.com/tags/BST/">
+<link rel="canonical" href="http://example.com/2021/10/16/BPlusTree/">
 
 
 <script id="page-configurations">
@@ -39,12 +44,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>标签: BST | Fenglin的小博客</title>
+  <title>BPlusTree | Fenglin的小博客</title>
   
 
 
@@ -154,51 +159,114 @@
         <div class="content-wrap">
           
 
-          <div class="content tag">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">BST
-          <small>标签</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/16/BPlusTree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/avatar.jpg">
+      <meta itemprop="name" content="凤林">
+      <meta itemprop="description" content="记录学习心得">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fenglin的小博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BPlusTree
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-10-16 18:01:36" itemprop="dateCreated datePublished" datetime="2021-10-16T18:01:36+08:00">2021-10-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-17 10:32:12" itemprop="dateModified" datetime="2021-10-17T10:32:12+08:00">2021-10-17</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+        <h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>上一篇文章讲了b树的实现，这一篇记录一下b+树的实现。b+树相较于b树的区别：</p>
+<ul>
+<li>数据只存储在叶子节点，非叶子节点只是存放key用于比较。</li>
+<li>叶子节点之间是相互连接的，可以是单链表或者双向链表。</li>
+<li>非叶子节点的一个key，右子树中的key永远是大于等于当前key的。</li>
+</ul>
+<p>别的也不再赘述了，网上资料很全，主要记录一下<a target="_blank" rel="noopener" href="https://github.com/fenglin-Zhou/Tree-structures">实现</a>，这里主要和b树对比。</p>
+<span id="more"></span>
+
+<p><img src="/img/bplustree1.png"></p>
+<h4 id="Insert"><a href="#Insert" class="headerlink" title="Insert"></a>Insert</h4><p>插入和b树其实基本一样，一直找到叶子节点，找到位置插入数据。插入里面用到几个函数后面细说，比如分裂节点。</p>
+<h4 id="Remove"><a href="#Remove" class="headerlink" title="Remove"></a>Remove</h4><p>删除和b树区别比较大，b树中数据可能在非叶子节点，但是b+树中非叶子节点是没有数据的，但存放了比较值key，也就是说为了删除的某个数据的时候可能需要删除两个地方的数据。不过b+树的特点保证了在非叶子节点中的key一定是对应child中最小值的。（比如删除16，还要删除真正存储数据的叶子节点）。从root_开始，每次向下遍历主要经历一下几个过程：</p>
+<ul>
+<li><p>找到第一个大于或等于key的位置index,如果已经是叶子节点并且是要删除的key，那么就直接删除。</p>
+</li>
+<li><p>找到了key并且是要删除的，但是不是叶子节点。如果左孩子节点有大于degree个key，就借一个过来，或者借右孩子，再不行就只能合并了，在循环过程。这里需要值得注意的是借数据和b树不一样。</p>
+</li>
+<li><ul>
+<li>跟前面的借是我们返回最大值，但是还要直接通过链表将最大值输送到最大值节点的next节点的第一位，因为是在同一个父节点下借数据所以最大值一定是借给next的。然后再删除借到的最大值，并将最大值key放在当前位置。</li>
+<li>跟后面借时，需要返回的时最小值的下一位，因为最小值是按照b+树的特性就是我们要删除的值，然后向下删除key。</li>
+</ul>
+</li>
+<li><p>如果key不在，就像下查询，这个过程中的操作和b树基本一样。</p>
+</li>
+</ul>
+<p>不断重复上述过程就完成了remove操作，remove操作比insert是要复杂很多的，主要是涉及到很多种情况。需要分很多情况去讨论。</p>
+<h4 id="merge函数"><a href="#merge函数" class="headerlink" title="merge函数"></a>merge函数</h4><p>merge函数用于合并当前节点的两个相邻子节点，这里和b树不同的是要分开讨论子节点是叶子和非叶子。如果是叶子节点，那么我只直接将右节点的数据全部拷贝过来将左节点next指针跳过右节点。如果是非叶子节点，就和b树一样。</p>
+<h4 id="splitchild函数"><a href="#splitchild函数" class="headerlink" title="splitchild函数"></a>splitchild函数</h4><p>分裂函数和b树不同之处在于需要也是再对叶子节点的处理上，叶子节点需要链表链接，并且叶子节点是将中值上移的同时叶子节点还保存数据。非叶子节点和b树一样。</p>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-09-25T20:48:10+08:00"
-              content="2021-09-25">
-          09-25
-        </time>
-      </div>
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Treedatastructure/" rel="tag"># Treedatastructure</a>
+              <a href="/tags/BPlusTree/" rel="tag"># BPlusTree</a>
+          </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/09/25/Binary-Search-Tree/" itemprop="url">
-            <span itemprop="name">Binary_Search_Tree</span>
-          </a>
-      </div>
+        
 
-    </header>
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/04/BTree/" rel="prev" title="BTree">
+      <i class="fa fa-chevron-left"></i> BTree
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
   </article>
-
-    </div>
-  </div>
   
   
-  
-
   
 
 
@@ -251,6 +319,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#B-%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">B+树</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Insert"><span class="nav-number">1.1.</span> <span class="nav-text">Insert</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Remove"><span class="nav-number">1.2.</span> <span class="nav-text">Remove</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#merge%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">merge函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#splitchild%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.</span> <span class="nav-text">splitchild函数</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
