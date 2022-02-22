@@ -20,23 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="二叉搜索树BST是比较简单的树结构，满足下面三个性质。 1.若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值； 2.若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值； 3.任意节点的左、右子树也分别为二叉查找树； 代码地址">
+  <meta name="description" content="哈希表哈希表是一个抽象数据，用来提供无序关联数组实现或 API 的类型，这意味着我们能够将任意键映射到任意值，没有任何顺序，就像我们将在树中看到的那样。我们能够通过散列函数快速查找，来找到我们想要的元素，该函数将通过我们的键，然后以某种方式计算一些偏移量到某个位置我的数组中，这会告诉我们确切地寻找元素，或者我可以简单地环顾四周向下找到我们想要的元素。散列函数总是会告诉我们正确的位置，即便是需要我们">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Binary_Search_Tree">
-<meta property="og:url" content="http://example.com/2021/09/25/Binary-Search-Tree/index.html">
+<meta property="og:title" content="hash">
+<meta property="og:url" content="http://example.com/2022/02/22/hash/index.html">
 <meta property="og:site_name" content="Fenglin的小博客">
-<meta property="og:description" content="二叉搜索树BST是比较简单的树结构，满足下面三个性质。 1.若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值； 2.若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值； 3.任意节点的左、右子树也分别为二叉查找树； 代码地址">
+<meta property="og:description" content="哈希表哈希表是一个抽象数据，用来提供无序关联数组实现或 API 的类型，这意味着我们能够将任意键映射到任意值，没有任何顺序，就像我们将在树中看到的那样。我们能够通过散列函数快速查找，来找到我们想要的元素，该函数将通过我们的键，然后以某种方式计算一些偏移量到某个位置我的数组中，这会告诉我们确切地寻找元素，或者我可以简单地环顾四周向下找到我们想要的元素。散列函数总是会告诉我们正确的位置，即便是需要我们">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/Binary_search_tree.png">
-<meta property="article:published_time" content="2021-09-25T12:48:10.000Z">
-<meta property="article:modified_time" content="2021-09-26T07:58:16.000Z">
+<meta property="article:published_time" content="2022-02-22T13:56:24.000Z">
+<meta property="article:modified_time" content="2022-02-22T14:01:51.305Z">
 <meta property="article:author" content="凤林">
-<meta property="article:tag" content="Treedatastructure">
-<meta property="article:tag" content="BST">
+<meta property="article:tag" content="Hash">
+<meta property="article:tag" content="DBMS">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/img/Binary_search_tree.png">
 
-<link rel="canonical" href="http://example.com/2021/09/25/Binary-Search-Tree/">
+<link rel="canonical" href="http://example.com/2022/02/22/hash/">
 
 
 <script id="page-configurations">
@@ -49,7 +47,7 @@
   };
 </script>
 
-  <title>Binary_Search_Tree | Fenglin的小博客</title>
+  <title>hash | Fenglin的小博客</title>
   
 
 
@@ -166,7 +164,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/09/25/Binary-Search-Tree/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/22/hash/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/img/avatar.jpg">
@@ -179,7 +177,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Binary_Search_Tree
+          hash
         </h1>
 
         <div class="post-meta">
@@ -188,16 +186,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-09-25 20:48:10" itemprop="dateCreated datePublished" datetime="2021-09-25T20:48:10+08:00">2021-09-25</time>
+              <time title="创建时间：2022-02-22 21:56:24 / 修改时间：22:01:51" itemprop="dateCreated datePublished" datetime="2022-02-22T21:56:24+08:00">2022-02-22</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-09-26 15:58:16" itemprop="dateModified" datetime="2021-09-26T15:58:16+08:00">2021-09-26</time>
-              </span>
 
           
 
@@ -210,21 +202,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h4 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h4><p>BST是比较简单的树结构，满足下面三个性质。<br></p>
-<p>1.若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；<br></p>
-<p>2.若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；<br></p>
-<p>3.任意节点的左、右子树也分别为二叉查找树；<br></p>
-<p><a target="_blank" rel="noopener" href="https://github.com/fenglin-Zhou/Tree-structures">代码地址</a></p>
+        <h4 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h4><p>哈希表是一个抽象数据，用来提供无序关联数组实现或 API 的类型，这意味着我们能够将任意键映射到任意值，没有任何顺序，就像我们将在树中看到的那样。我们能够通过散列函数快速查找，来找到我们想要的元素，该函数将通过我们的键，然后以某种方式计算一些偏移量到某个位置我的数组中，这会告诉我们确切地寻找元素，或者我可以简单地环顾四周向下找到我们想要的元素。散列函数总是会告诉我们正确的位置，即便是需要我们向下继续搜索。</p>
 <span id="more"></span>
 
-<p><img src="/img/Binary_search_tree.png"></p>
-<h5 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h5><p>插入的时候就是每次找到插入的位置，然后将前序节点的孩子节点指针指向新的插入的节点。还是比较简单的。</p>
-<h5 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h5><p>删除节点比较复杂一点，需要找到要删除的节点。<br></p>
-<p>1.如果没有左右孩子，直接删除。<br></p>
-<p>2.如果存在左孩子，那么我们需要找到左孩子序列中的最大节点，替代删除的节点，然后再去寻找删除替换上来的节点，重复到最后就变成了没有左右孩子的节点删除。<br></p>
-<p>3.没有左孩子，那么找到右孩子的最小节点，替代删除的节点，然后再去寻找删除替换上来的节点，重复到最后就变成了没有左右孩子的节点删除。<br></p>
-<p>最后都变成删除叶子节点。</p>
-<h5 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h5><p>查询就比较简单了，只需要比较找到值就好了。</p>
+<p>哈希表的空间复杂度为O（n）,我们对于我们想要存储的每个键，我们在哈希表中至少有一个条目，因此分配该内存量的空间。操作复杂度，也就是常说的时间复杂度。就平均来说是O（1）,我们将进行一次查找，就可以准确地找到想要的值。最坏情况是O（n），因为在最坏情况下我们需要扫描搜索以查找每个可能的键来找到我们寻找的键。但在大部分情况都是O1。</p>
+<h4 id="静态哈希表"><a href="#静态哈希表" class="headerlink" title="静态哈希表"></a>静态哈希表</h4><p>最简单的哈希表，我们建立一个巨大的数组，分配一块大的内存，数组中每个偏移量对应给定元素，我们假设提前知道键数量，现在我们找到对应元素只需要对key进行散列就可以得到偏移量得到元素。假设我们有三个键abc，de，，，然后通过散列函数得到我们需要的数据，但是在实际应用中，大部分是存储的一个指针索引，指向我们存储数据的地方，然后找到我们需要的元素。</p>
+<h4 id="假设"><a href="#假设" class="headerlink" title="假设"></a>假设</h4><p>上面讲述的简单快速的哈希表是有前提的，我们需要提前知道元素数量来分配空间，不能在使用的时候扩充容量。另一个是键是唯一的，不能存在冲突，对于一个key散列函数算出的应该是一个唯一个偏移量。就是因为我们知道所以的键，我们知道散列是唯一的，就是所谓的完美散列函数，但是实际中并不存在完美散列函数。</p>
+<h4 id="哈希表-1"><a href="#哈希表-1" class="headerlink" title="哈希表"></a>哈希表</h4><p>哈希表又两部分组成，一个是哈希函数，通过任意的键映射到一个的位置，无论说是字符串还是整数都可以。散列函数我们必须考虑碰撞和速度的比率，如果将不同键映射到相同位置，就会发生碰撞冲突，最快的哈希函数就是输出1，非常快但也冲突率爆炸了，所以哈希函数选择很重要。另一个是哈希方案，本质上是我们的程序在哈希函数遇到冲突是使用的方案。需要我们在内存和计算之间权衡，我们不能分配全部内存，碰撞率为0，那我们就不能做别的事了，如果我们给大小为1的数组，那我们碰撞率会爆炸，所以我们操作来解决冲突，并且我们存储使用空间很小。</p>
 
     </div>
 
@@ -234,8 +218,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Treedatastructure/" rel="tag"># Treedatastructure</a>
-              <a href="/tags/BST/" rel="tag"># BST</a>
+              <a href="/tags/Hash/" rel="tag"># Hash</a>
+              <a href="/tags/DBMS/" rel="tag"># DBMS</a>
           </div>
 
         
@@ -244,12 +228,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/09/05/skiplist/" rel="prev" title="skiplist">
-      <i class="fa fa-chevron-left"></i> skiplist
+    <a href="/2021/11/30/LRUCache/" rel="prev" title="LRUCache">
+      <i class="fa fa-chevron-left"></i> LRUCache
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/09/26/avltree/" rel="next" title="avltree">
-      avltree <i class="fa fa-chevron-right"></i>
+    <a href="/2022/02/22/%E9%9D%99%E6%80%81%E5%93%88%E5%B8%8C/" rel="next" title="静态哈希">
+      静态哈希 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -309,7 +293,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">二叉搜索树</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8F%92%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">插入</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A0%E9%99%A4"><span class="nav-number">1.2.</span> <span class="nav-text">删除</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2"><span class="nav-number">1.3.</span> <span class="nav-text">查询</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E8%A1%A8"><span class="nav-number">1.</span> <span class="nav-text">哈希表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%93%88%E5%B8%8C%E8%A1%A8"><span class="nav-number">2.</span> <span class="nav-text">静态哈希表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%81%87%E8%AE%BE"><span class="nav-number">3.</span> <span class="nav-text">假设</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E8%A1%A8-1"><span class="nav-number">4.</span> <span class="nav-text">哈希表</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
