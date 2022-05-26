@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-next.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32-next.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16-next.jpg">
+  <link rel="mask-icon" href="/img/avatar.jpg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="CMU15445数据库实验一缓冲池实现第一次实验主要是实现一个最近最少使用页面置换算法和缓冲池。页面置换算法用来判断需要被缓冲池抛弃写入到磁盘的page。缓冲池则保存了从磁盘读取到内存的page，我们获取数据首先去缓冲池获取，如果不存在则需要页面置换算法从磁盘中取出想要的page并替换掉缓冲池中未被使用的数据。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CMU_Project_1_缓冲池_buffer_pool_manager">
+<meta property="og:url" content="http://example.com/2022/05/25/CMU-Project-1/index.html">
+<meta property="og:site_name" content="Fenglin的小博客">
+<meta property="og:description" content="CMU15445数据库实验一缓冲池实现第一次实验主要是实现一个最近最少使用页面置换算法和缓冲池。页面置换算法用来判断需要被缓冲池抛弃写入到磁盘的page。缓冲池则保存了从磁盘读取到内存的page，我们获取数据首先去缓冲池获取，如果不存在则需要页面置换算法从磁盘中取出想要的page并替换掉缓冲池中未被使用的数据。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/cmu1.jpg">
+<meta property="article:published_time" content="2022-05-25T13:39:23.000Z">
+<meta property="article:modified_time" content="2022-05-26T13:58:19.674Z">
+<meta property="article:author" content="凤林">
+<meta property="article:tag" content="缓存池">
+<meta property="article:tag" content="LRUCache">
+<meta property="article:tag" content="CMU">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/cmu1.jpg">
+
+<link rel="canonical" href="http://example.com/2022/05/25/CMU-Project-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CMU_Project_1_缓冲池_buffer_pool_manager | Fenglin的小博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Fenglin的小博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/fenglin-Zhou" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/25/CMU-Project-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/avatar.jpg">
+      <meta itemprop="name" content="凤林">
+      <meta itemprop="description" content="记录学习心得">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fenglin的小博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CMU_Project_1_缓冲池_buffer_pool_manager
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-25 21:39:23" itemprop="dateCreated datePublished" datetime="2022-05-25T21:39:23+08:00">2022-05-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-26 21:58:19" itemprop="dateModified" datetime="2022-05-26T21:58:19+08:00">2022-05-26</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="CMU15445数据库实验一缓冲池实现"><a href="#CMU15445数据库实验一缓冲池实现" class="headerlink" title="CMU15445数据库实验一缓冲池实现"></a>CMU15445数据库实验一缓冲池实现</h2><p>第一次实验主要是实现一个最近最少使用页面置换算法和缓冲池。页面置换算法用来判断需要被缓冲池抛弃写入到磁盘的page。缓冲池则保存了从磁盘读取到内存的page，我们获取数据首先去缓冲池获取，如果不存在则需要页面置换算法从磁盘中取出想要的page并替换掉缓冲池中未被使用的数据。</p>
+<span id="more"></span>
+
+<p>看下面这个图，在做这个实验之前我们需要明确frame和page的关系，frame代表的是缓冲池中每个可以存放一个page的坑位的id，也就是说一个page对应一个frame。而lru replacer要做的就是记录每个frame的使用记录，如果这个frame存放的page最近最少使用，那么就需要将这个位置的page写入磁盘并将新的page从磁盘中捞出数据放到缓冲池中，并记录相关关联。</p>
+<p><img src="/img/cmu1.jpg"></p>
+<h3 id="最近最少使用LRU页面置换算法"><a href="#最近最少使用LRU页面置换算法" class="headerlink" title="最近最少使用LRU页面置换算法"></a>最近最少使用LRU页面置换算法</h3><p>首先是lru_replacer类的实现。我们有和缓冲池大小相等的frame空间，一个frame里面保存一个page_id。每次缓冲池需要置换时就是看哪个frame里面的page最近最少使用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">std::mutex latch_; // 保证并发安全，无需多言</span><br><span class="line">size_t capacity_;  // 保存这个replacer有多大，也就是有多少page可以保存</span><br><span class="line">std::list&lt;frame_id_t&gt; lru_list_;  // 这里面是可用frame位置</span><br><span class="line">std::map&lt;frame_id_t, std::list&lt;frame_id_t&gt;::iterator&gt; lru_map_; // 这里保存了每个可用frame关联的在list中的位置</span><br></pre></td></tr></table></figure>
+
+<h5 id="Pin函数"><a href="#Pin函数" class="headerlink" title="Pin函数"></a>Pin函数</h5><p>Pin的作用是将这个frame锁定，也就是他被使用了，那么我们就需要将他从可用frame中移除。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void LRUReplacer::Pin(frame_id_t frame_id) &#123;</span><br><span class="line">  std::unique_lock&lt;std::mutex&gt; lock(latch_);</span><br><span class="line">  if (lru_map_.find(frame_id) != lru_map_.end()) &#123;</span><br><span class="line">    lru_list_.erase(lru_map_[frame_id]);</span><br><span class="line">    lru_map_.erase(frame_id);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="UnPin函数"><a href="#UnPin函数" class="headerlink" title="UnPin函数"></a>UnPin函数</h5><p>UnPin是说这个frame现在没人使用了，那么就应该将他添加到可用frame的头部，这样尾部就是最近最少使用的frame。0</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">void LRUReplacer::Unpin(frame_id_t frame_id) &#123;</span><br><span class="line">  std::unique_lock&lt;std::mutex&gt; lock(latch_);</span><br><span class="line">  if (lru_map_.find(frame_id) != lru_map_.end()) &#123;</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line">  while (Size() &gt;= capacity_) &#123;</span><br><span class="line">    frame_id_t to_del = lru_list_.back();</span><br><span class="line">    lru_list_.pop_back();</span><br><span class="line">    lru_map_.erase(to_del);</span><br><span class="line">  &#125;</span><br><span class="line">  // insert</span><br><span class="line">  lru_list_.push_front(frame_id);</span><br><span class="line">  lru_map_[frame_id] = lru_list_.begin();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="Victim函数"><a href="#Victim函数" class="headerlink" title="Victim函数"></a>Victim函数</h5><p>Victim是从可用frame中获取一个frame，是从尾部获取，因为尾部的是最久未使用的frame。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">bool LRUReplacer::Victim(frame_id_t *frame_id) &#123;</span><br><span class="line">  std::unique_lock&lt;std::mutex&gt; lock(latch_);</span><br><span class="line">  if (lru_map_.empty()) &#123;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line">  // select the last object and delete</span><br><span class="line">  frame_id_t last_frame = lru_list_.back();</span><br><span class="line">  lru_map_.erase(last_frame);</span><br><span class="line">  lru_list_.pop_back();</span><br><span class="line">  // no bug, But I think last_frame may be destroyed.</span><br><span class="line">  *frame_id = last_frame;</span><br><span class="line">  return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="缓冲池"><a href="#缓冲池" class="headerlink" title="缓冲池"></a>缓冲池</h3><p>缓冲池的作用就是将磁盘中的page放到内存中，不用每次获取数据都需要进行磁盘IO。这里实验原始代码已经给了类成员变量，我们只需要实现函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">/** Number of pages in the buffer pool. */</span><br><span class="line">size_t pool_size_;  //缓冲池大小</span><br><span class="line">/** Array of buffer pool pages. */</span><br><span class="line">Page *pages_;  // 缓冲池中的页面</span><br><span class="line">/** Pointer to the disk manager. */</span><br><span class="line">DiskManager *disk_manager_ __attribute__((__unused__));  // 磁盘管理器，从磁盘获取数据和写入数据到磁盘</span><br><span class="line">/** Pointer to the log manager. */</span><br><span class="line">LogManager *log_manager_ __attribute__((__unused__));  // 日志管理</span><br><span class="line">/** Page table for keeping track of buffer pool pages. */</span><br><span class="line">std::unordered_map&lt;page_id_t, frame_id_t&gt; page_table_;  // page对应的frame，也就是说这个page对应的在缓冲池中存储page的位置，比如page1在位置3</span><br><span class="line">/** Replacer to find unpinned pages for replacement. */</span><br><span class="line">Replacer *replacer_; // 页面置换算法</span><br><span class="line">/** List of free pages. */</span><br><span class="line">std::list&lt;frame_id_t&gt; free_list_;  // 未被使用的frame，初始化的时候是所有的frame都没被使用</span><br><span class="line">/** This latch protects shared data structures. We recommend updating this comment to describe what it protects. */</span><br><span class="line">std::mutex latch_;  // 并发控制锁</span><br></pre></td></tr></table></figure>
+
+<h4 id="FetchPageImpl函数"><a href="#FetchPageImpl函数" class="headerlink" title="FetchPageImpl函数"></a>FetchPageImpl函数</h4><p>用来获取指定page id的Page。<br>1、首先通过page_table_判断当前page是否在缓冲池中，如果在，则对page增加使用数量，并固定这个frame。<br>2、如果page不在缓冲池，那么需要首先获取一个frame，也就是替换掉缓冲池中不使用的page，替换规则先找free_list，再使用lru算法（lru中需要将旧的page写入到磁盘，并且删除page_table_中的数据）。<br>3、把需要获取的page写入到对应frame中，并更新page信息和lru replacer信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">Page *BufferPoolManager::FetchPageImpl(page_id_t page_id) &#123;</span><br><span class="line">  // 1.     Search the page table for the requested page (P).</span><br><span class="line">  // 1.1    If P exists, pin it and return it immediately.</span><br><span class="line">  // 1.2    If P does not exist, find a replacement page (R) from either the free list or the replacer.</span><br><span class="line">  //        Note that pages are always found from the free list first.</span><br><span class="line">  // 2.     If R is dirty, write it back to the disk.</span><br><span class="line">  // 3.     Delete R from the page table and insert P.</span><br><span class="line">  // 4.     Update P&#x27;s metadata, read in the page content from disk, and then return a pointer to P.</span><br><span class="line">  assert(page_id != INVALID_PAGE_ID);</span><br><span class="line">  // if (page_id == INVALID_PAGE_ID) &#123;</span><br><span class="line">  //   printf(&quot;1111\n&quot;);</span><br><span class="line">  //   return nullptr;</span><br><span class="line">  // &#125;</span><br><span class="line">  std::unique_lock&lt;std::mutex&gt; lock(latch_);</span><br><span class="line">  frame_id_t frame_id = GetFrame(page_id);</span><br><span class="line">  Page *page_ptr = nullptr;</span><br><span class="line">  if (frame_id != INVALID_FRAME_ID) &#123;</span><br><span class="line">    page_ptr = &amp;pages_[frame_id];</span><br><span class="line">    page_ptr-&gt;AddPinCount();</span><br><span class="line">    replacer_-&gt;Pin(frame_id);</span><br><span class="line">    return page_ptr;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  frame_id = GetAvailableFrame();</span><br><span class="line">  if (frame_id == INVALID_FRAME_ID) &#123;</span><br><span class="line">    return nullptr;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  page_table_.insert(&#123;page_id, frame_id&#125;);</span><br><span class="line">  page_ptr = &amp;pages_[frame_id];</span><br><span class="line">  disk_manager_-&gt;ReadPage(page_id, page_ptr-&gt;GetData());</span><br><span class="line">  page_ptr-&gt;SetPageId(page_id);</span><br><span class="line">  page_ptr-&gt;SetPinCount(1);</span><br><span class="line">  page_ptr-&gt;SetDirty(false);</span><br><span class="line">  replacer_-&gt;Pin(frame_id);</span><br><span class="line"></span><br><span class="line">  return page_ptr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="UnpinPageImpl函数"><a href="#UnpinPageImpl函数" class="headerlink" title="UnpinPageImpl函数"></a>UnpinPageImpl函数</h4><p>当我们使用完一个page的时候就需要取消固定这个page。<br>1、首先需要找到这个page所在的frame，如果更改过需要设置为dirty。<br>2、获取使用这个page的数量，如果小于1说明不需要操作，返回。<br>2、对这个page使用者数量减一，如果为0了，那么说明没有程序在使用，需要将这个frame添加到lru replacer中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">bool BufferPoolManager::UnpinPageImpl(page_id_t page_id, bool is_dirty) &#123;</span><br><span class="line">  std::unique_lock&lt;std::mutex&gt; lock(latch_);</span><br><span class="line">  frame_id_t frame_id = GetFrame(page_id);</span><br><span class="line">  if (frame_id == INVALID_FRAME_ID) &#123;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Page *page_ptr = GetPage(frame_id);</span><br><span class="line">  if (is_dirty) &#123;</span><br><span class="line">    page_ptr-&gt;SetDirty(is_dirty);</span><br><span class="line">  &#125;</span><br><span class="line">  int pin_count = page_ptr-&gt;GetPinCount();</span><br><span class="line">  if (pin_count &lt;= 0) &#123;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line">  pin_count = page_ptr-&gt;SubPinCount();</span><br><span class="line">  if (pin_count == 0) &#123;</span><br><span class="line">    replacer_-&gt;Unpin(frame_id);</span><br><span class="line">  &#125;</span><br><span class="line">  return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="FlushPageImpl函数"><a href="#FlushPageImpl函数" class="headerlink" title="FlushPageImpl函数"></a>FlushPageImpl函数</h4><p>将给定page写入到磁盘中，并且从缓冲池中清洗掉。<br>1、首先找到这个page所在frame，如果修改过需要调用磁盘管理器写数据到磁盘。<br>2、将在缓冲池中的位置的page删除，并将这个frame添加到freelist中，因为这个frame不用了，并且lru replacer需要固定这个frame，因为这个frame添加到free list中了，不会是lru中的替换页面。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">bool BufferPoolManager::FlushPageImpl(page_id_t page_id) &#123;</span><br><span class="line">  // Make sure you call DiskManager::WritePage!</span><br><span class="line">  assert(page_id != INVALID_PAGE_ID);</span><br><span class="line">  std::unique_lock&lt;std::mutex&gt; lock(latch_);</span><br><span class="line">  frame_id_t frame_id = GetFrame(page_id);</span><br><span class="line">  if (frame_id == INVALID_FRAME_ID) &#123;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line">  Page *page_ptr = GetPage(frame_id);</span><br><span class="line">  // </span><br><span class="line">  if (page_ptr-&gt;IsDirty()) &#123;</span><br><span class="line">    disk_manager_-&gt;WritePage(page_id, page_ptr-&gt;GetData());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  page_ptr-&gt;ResetAll();</span><br><span class="line">  page_table_.erase(page_id);</span><br><span class="line">  free_list_.push_back(frame_id);</span><br><span class="line">  replacer_-&gt;Pin(frame_id);</span><br><span class="line"></span><br><span class="line">  return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="NewPageImpl函数"><a href="#NewPageImpl函数" class="headerlink" title="NewPageImpl函数"></a>NewPageImpl函数</h4><p>申请一个新的page。<br>1、首先需要在缓冲池中获取frame来存储page，然后在磁盘中申请一块page地址，将page各项数据初始化。<br>2、在缓冲池中更新page对应的frame，并将新的page写入磁盘，因为只是申请了一个page id。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Page *BufferPoolManager::NewPageImpl(page_id_t *page_id) &#123;</span><br><span class="line">  // 0.   Make sure you call DiskManager::AllocatePage!</span><br><span class="line">  // 1.   If all the pages in the buffer pool are pinned, return nullptr.</span><br><span class="line">  // 2.   Pick a victim page P from either the free list or the replacer. Always pick from the free list first.</span><br><span class="line">  // 3.   Update P&#x27;s metadata, zero out memory and add P to the page table.</span><br><span class="line">  // 4.   Set the page ID output parameter. Return a pointer to P.</span><br><span class="line">  std::unique_lock&lt;std::mutex&gt; lock(latch_);</span><br><span class="line">  frame_id_t frame_id = GetAvailableFrame();</span><br><span class="line">  if (frame_id == INVALID_FRAME_ID) &#123;</span><br><span class="line">    return nullptr;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Page *page_ptr = GetPage(frame_id);</span><br><span class="line">  page_id_t new_page_id = disk_manager_-&gt;AllocatePage();</span><br><span class="line">  page_ptr-&gt;ResetAll();</span><br><span class="line">  page_ptr-&gt;SetPageId(new_page_id);</span><br><span class="line">  page_ptr-&gt;SetPinCount(1);</span><br><span class="line"></span><br><span class="line">  page_table_.insert(&#123;new_page_id, frame_id&#125;);</span><br><span class="line">  replacer_-&gt;Pin(frame_id);</span><br><span class="line"></span><br><span class="line">  disk_manager_-&gt;WritePage(page_ptr-&gt;GetPageId(), page_ptr-&gt;GetData());</span><br><span class="line">  *page_id = new_page_id;</span><br><span class="line">  return page_ptr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="DeletePageImpl函数"><a href="#DeletePageImpl函数" class="headerlink" title="DeletePageImpl函数"></a>DeletePageImpl函数</h4><p>删除这个page，从缓冲池中和磁盘中删除。<br>1、找到这个page对应的frame，如果不在缓冲池中，直接调用磁盘管理器删除<br>2、在缓冲池中，如果有程序在调用这个page，则直接返回失败，没有程序调用在磁盘中清除，并更新page_table信息，将这个frame添加到freelist。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">bool BufferPoolManager::DeletePageImpl(page_id_t page_id) &#123;</span><br><span class="line">  // 0.   Make sure you call DiskManager::DeallocatePage!</span><br><span class="line">  // 1.   Search the page table for the requested page (P).</span><br><span class="line">  // 1.   If P does not exist, return true.</span><br><span class="line">  // 2.   If P exists, but has a non-zero pin-count, return false. Someone is using the page.</span><br><span class="line">  // 3.   Otherwise, P can be deleted. Remove P from the page table, reset its metadata and return it to the free list.</span><br><span class="line">  assert(page_id != INVALID_PAGE_ID);</span><br><span class="line">  std::unique_lock&lt;std::mutex&gt; lock(latch_);</span><br><span class="line">  frame_id_t frame_id = GetFrame(page_id);</span><br><span class="line">  if (frame_id == INVALID_FRAME_ID) &#123;</span><br><span class="line">    disk_manager_-&gt;DeallocatePage(page_id);</span><br><span class="line">    return true;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Page *page_ptr = GetPage(frame_id);</span><br><span class="line">  if (page_ptr-&gt;GetPinCount() &gt; 0) &#123;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  disk_manager_-&gt;DeallocatePage(page_id);</span><br><span class="line">  page_table_.erase(page_id);</span><br><span class="line">  page_ptr-&gt;ResetAll();</span><br><span class="line">  replacer_-&gt;Pin(frame_id);</span><br><span class="line">  free_list_.push_back(frame_id);</span><br><span class="line"></span><br><span class="line">  return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BC%93%E5%AD%98%E6%B1%A0/" rel="tag"># 缓存池</a>
+              <a href="/tags/LRUCache/" rel="tag"># LRUCache</a>
+              <a href="/tags/CMU/" rel="tag"># CMU</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/15/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%95%85%E9%9A%9C%E5%AF%B9%E7%AD%96/" rel="prev" title="数据库系统故障对策">
+      <i class="fa fa-chevron-left"></i> 数据库系统故障对策
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CMU15445%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%9E%E9%AA%8C%E4%B8%80%E7%BC%93%E5%86%B2%E6%B1%A0%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">CMU15445数据库实验一缓冲池实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E8%BF%91%E6%9C%80%E5%B0%91%E4%BD%BF%E7%94%A8LRU%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">最近最少使用LRU页面置换算法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Pin%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">Pin函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#UnPin%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">UnPin函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Victim%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.0.3.</span> <span class="nav-text">Victim函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%86%B2%E6%B1%A0"><span class="nav-number">1.2.</span> <span class="nav-text">缓冲池</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#FetchPageImpl%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.1.</span> <span class="nav-text">FetchPageImpl函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UnpinPageImpl%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.2.</span> <span class="nav-text">UnpinPageImpl函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FlushPageImpl%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.3.</span> <span class="nav-text">FlushPageImpl函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NewPageImpl%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.4.</span> <span class="nav-text">NewPageImpl函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DeletePageImpl%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.5.</span> <span class="nav-text">DeletePageImpl函数</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="凤林"
+      src="/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">凤林</p>
+  <div class="site-description" itemprop="description">记录学习心得</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">凤林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/clicklove.js"></script>
+</body>
+</html>
